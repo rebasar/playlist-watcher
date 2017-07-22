@@ -1,4 +1,4 @@
-# Playlist Wawtcher
+# Playlist Watcher
 
 A simple tool for posting additions to a Spotify playlist to the Microsoft
 Teams group chat for discussion
