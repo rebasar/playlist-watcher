@@ -1,0 +1,16 @@
+spotifyClientId: deadbeefcafebabe
+spotifyClientSecret: cafebabedeadbeef
+webhookUrl: https://outlook.office.com/webhook/...
+playlistUsername: example
+playlistId: 0123456789ABCDEF
+schedule:
+  default: 30
+  rules:
+    - day: MONDAY
+      start: 12
+      end: 16
+      interval: 10
+    - day: WEDNESDAY
+      start: 21
+      end: 23
+      interval: 300
