@@ -1,22 +1,21 @@
 package net.rebworks.playlist.watcher.spotify;
 
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.exceptions.WebApiException;
-import com.wrapper.spotify.methods.PlaylistTracksRequest;
-import com.wrapper.spotify.models.Page;
-import com.wrapper.spotify.models.PlaylistTrack;
-import net.rebworks.playlist.watcher.spotify.exceptions.PlaylistFetchException;
+import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
+import com.wrapper.spotify.model_objects.specification.Paging;
+import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
+import com.wrapper.spotify.requests.data.playlists.GetPlaylistsTracksRequest;
 import net.rebworks.playlist.watcher.TrackInfo;
+import net.rebworks.playlist.watcher.spotify.exceptions.PlaylistFetchException;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class PlaylistFetcherImpl implements PlaylistFetcher {
-    private final Api api;
+    private final SpotifyApi api;
     private final TokenManager tokenManager;
 
-    public PlaylistFetcherImpl(final Api api, final TokenManager tokenManager) {
+    public PlaylistFetcherImpl(final SpotifyApi api, final TokenManager tokenManager) {
         this.api = api;
         this.tokenManager = tokenManager;
     }
@@ -25,12 +24,13 @@ public class PlaylistFetcherImpl implements PlaylistFetcher {
     public Stream<TrackInfo> fetch(final PlaylistId playlist) {
         try {
             tokenManager.ensure();
-            final PlaylistTracksRequest playlistTracksRequest = api.getPlaylistTracks(playlist.getUserId(),
-                                                                                      playlist.getPlaylistId()).build();
-            final Page<PlaylistTrack> playlistTrackPage = playlistTracksRequest.get();
-            final List<PlaylistTrack> tracks = playlistTrackPage.getItems();
-            return tracks.stream().map(TrackInfo::from);
-        } catch (IOException | WebApiException exception) {
+            final GetPlaylistsTracksRequest playlistTracksRequest = api.getPlaylistsTracks(
+                    playlist.getPlaylistId()).build();
+            final Paging<PlaylistTrack> playlistTrackPage = playlistTracksRequest
+                    .execute();
+            final PlaylistTrack[] tracks = playlistTrackPage.getItems();
+            return Stream.of(tracks).map(TrackInfo::from);
+        } catch (IOException | SpotifyWebApiException exception) {
             throw new PlaylistFetchException(exception);
         }
     }
