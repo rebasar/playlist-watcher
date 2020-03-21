@@ -1,7 +1,7 @@
 package net.rebworks.playlist.watcher;
 
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.exceptions.WebApiException;
+import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import net.rebworks.playlist.watcher.configuration.finder.ConfigFileFinderResult;
 import net.rebworks.playlist.watcher.configuration.Configuration;
 import net.rebworks.playlist.watcher.configuration.ConfigurationLoader;
@@ -36,7 +36,7 @@ class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static void main(final String[] argv) throws IOException, WebApiException, InterruptedException {
+    public static void main(final String[] argv) throws IOException, SpotifyWebApiException, InterruptedException {
         final SignalHandler signalHandler = new SignalHandler();
         signalHandler.install();
         final FileChecker fileChecker = new FileCheckerImpl();
@@ -73,9 +73,9 @@ class Main {
     }
 
     private static PlaylistFetcher initializeFetcher(final Configuration configuration) {
-        final Api api = Api.builder()
-                           .clientId(configuration.getSpotifyClientId())
-                           .clientSecret(configuration.getSpotifyClientSecret())
+        final SpotifyApi api = SpotifyApi.builder()
+                           .setClientId(configuration.getSpotifyClientId())
+                           .setClientSecret(configuration.getSpotifyClientSecret())
                            .build();
         final TokenManager tokenManager = new TokenManager(api);
         return new PlaylistFetcherImpl(api, tokenManager);
