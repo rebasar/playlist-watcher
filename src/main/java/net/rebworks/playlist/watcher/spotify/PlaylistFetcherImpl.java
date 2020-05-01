@@ -7,6 +7,7 @@ import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistsTracksRequest;
 import net.rebworks.playlist.watcher.TrackInfo;
 import net.rebworks.playlist.watcher.spotify.exceptions.PlaylistFetchException;
+import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -30,7 +31,7 @@ public class PlaylistFetcherImpl implements PlaylistFetcher {
                     .execute();
             final PlaylistTrack[] tracks = playlistTrackPage.getItems();
             return Stream.of(tracks).map(TrackInfo::from);
-        } catch (IOException | SpotifyWebApiException exception) {
+        } catch (IOException | SpotifyWebApiException | ParseException exception) {
             throw new PlaylistFetchException(exception);
         }
     }
