@@ -4,7 +4,7 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.specification.Paging;
 import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
-import com.wrapper.spotify.requests.data.playlists.GetPlaylistsTracksRequest;
+import com.wrapper.spotify.requests.data.playlists.GetPlaylistsItemsRequest;
 import net.rebworks.playlist.watcher.TrackInfo;
 import net.rebworks.playlist.watcher.spotify.exceptions.PlaylistFetchException;
 import org.apache.hc.core5.http.ParseException;
@@ -25,7 +25,7 @@ public class PlaylistFetcherImpl implements PlaylistFetcher {
     public Stream<TrackInfo> fetch(final PlaylistId playlist) {
         try {
             tokenManager.ensure();
-            final GetPlaylistsTracksRequest playlistTracksRequest = api.getPlaylistsTracks(
+            final GetPlaylistsItemsRequest playlistTracksRequest = api.getPlaylistsItems(
                     playlist.getPlaylistId()).build();
             final Paging<PlaylistTrack> playlistTrackPage = playlistTracksRequest
                     .execute();

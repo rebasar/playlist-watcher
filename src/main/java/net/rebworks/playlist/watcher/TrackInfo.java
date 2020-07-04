@@ -1,6 +1,8 @@
 package net.rebworks.playlist.watcher;
 
+import com.wrapper.spotify.model_objects.IPlaylistItem;
 import com.wrapper.spotify.model_objects.specification.ArtistSimplified;
+import com.wrapper.spotify.model_objects.specification.Episode;
 import com.wrapper.spotify.model_objects.specification.PlaylistTrack;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.model_objects.specification.User;
@@ -35,14 +37,32 @@ public interface TrackInfo extends Comparable<TrackInfo> {
 
     static TrackInfo from(final PlaylistTrack playlistTrack) {
         final User addedBy = playlistTrack.getAddedBy();
-        final Track track = playlistTrack.getTrack();
         final String userName = addedBy.getDisplayName() == null ? addedBy.getId() : addedBy.getDisplayName();
+        final IPlaylistItem track = playlistTrack.getTrack();
+        final LocalDateTime addedAt = LocalDateTime.ofInstant(playlistTrack.getAddedAt().toInstant(),
+                                                              ZoneId.systemDefault());
+        final Builder builder = builder().userName(userName).addedAt(addedAt);
+        if (track instanceof Track) {
+            return populateTrackInfo((Track) track, builder);
+        } else if (track instanceof Episode){
+            return populateTrackInfo((Episode) track, builder);
+        } else {
+            return builder.title("Unknown Title").artists("Unknown Artist").isExplicit(false).build();
+        }
+    }
+
+    static TrackInfo populateTrackInfo(final Track track, final Builder builder) {
         final String title = track.getName();
         final String artists = Stream.of(track.getArtists()).map(ArtistSimplified::getName).collect(joining(", "));
         final boolean explicit = track.getIsExplicit();
-        final LocalDateTime addedAt = LocalDateTime.ofInstant(playlistTrack.getAddedAt().toInstant(),
-                                                              ZoneId.systemDefault());
-        return builder().addedAt(addedAt).userName(userName).title(title).artists(artists).isExplicit(explicit).build();
+        return builder.title(title).artists(artists).isExplicit(explicit).build();
+    }
+
+    static TrackInfo populateTrackInfo(final Episode episode, final Builder builder) {
+        final String title = episode.getName();
+        final String artists = episode.getShow().getName();
+        final boolean explicit = episode.getExplicit();
+        return builder.title(title).artists(artists).isExplicit(explicit).build();
     }
 
     static Builder builder() {
